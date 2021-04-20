@@ -1,11 +1,11 @@
-from ase import Atoms
+#from ase import Atoms
 from ase.io import read, write
 import numpy as np
 from scipy.integrate import quad
-from scipy.spatial.transform import Rotation
-from scipy import special
-from ase.optimize import BFGS
-from ase.calculators.emt import EMT
+#from scipy.spatial.transform import Rotation
+#from scipy import special
+#from ase.optimize import BFGS
+#from ase.calculators.emt import EMT
 import argparse
 import sys
 import math
@@ -24,15 +24,18 @@ parser.add_argument("--outtype", type=str, default='aims', help="Type of output 
 
 args = parser.parse_args()
 
-if (args.func == 1):  #c is not used here
-  def pfunction(t, a, b, c): # the sine-like parametric function. x=t/2pi * wavelength, y=amplitude * sin(t)
+#
+
+if (args.func == 1):
+   def pfunction(t, a, b, c): # the sine-like parametric function. x=t/2pi * wavelength, y=amplitude * sin(t)
     x = t/2/np.pi*b
     y = a*np.sin(t)
     dx = b/2/np.pi
     dy = a*np.cos(t)
     return (x, y, dx, dy)
-  def arclength(x1, x2, a, b, c):
+   def arclength(x1, x2, a, b, c):
     return quad(lambda t: np.sqrt(math.pow(a*np.cos(t),2)+math.pow(b/2/np.pi,2)), x1, x2)[0]
+   print('the sine-like parametric function. x=t/2pi * wavelength, y=amplitude * sin(t) is requested!')  
 elif (args.func == 2):    # the elliptic-like parametric function.
   def pfunction(t, a, b, c): # first the upper half, shifted such that x goes from 0 till wavelength/2
     if (t <= np.pi):
@@ -48,6 +51,7 @@ elif (args.func == 2):    # the elliptic-like parametric function.
     return(x, y, dx, dy)    # "upper" side of the 2D material
   def arclength(x1, x2, a, b, c):
     return quad(lambda t: np.sqrt(math.pow(a*np.cos(t),2)+math.pow(b/4*np.sin(t),2)), x1, x2)[0]
+  print('the elliptic-like parametric function wrinkle is requested!')
 elif (args.func == 3):
   def pfunction(t, a, b, c): # the circle-like parametric function. x=cos(t) * wavelength, y=amplitude * sin(t)
     x = b*np.cos(t)
@@ -57,6 +61,7 @@ elif (args.func == 3):
     return (x, y, dx, dy)
   def arclength(x1, x2, a, b, c):
     return quad(lambda t: np.sqrt(math.pow(a*np.cos(t),2)+math.pow(b*np.sin(t),2)), x1, x2)[0]
+  print('the circle-like parametric function (i.e. nanotube). x=cos(t) * wavelength, y=amplitude * sin(t) is requested')
 elif (args.func == 4):
   def pfunction(t, a, b, c): # Hypotrochoid function, a=R, b=r, c=d
     x = (a - b)*np.cos(t) + c*np.cos((a - b)/b*t)
@@ -71,6 +76,11 @@ else:
   sys.exit()
 
 wrinkle = args.dir
+if wrinkle > 1 or wrinkle <0:
+    print( "[WARNING] wrinkle direction ", args.dir, " not defined") 
+    print("[WARNING] wrinkle direction is set to None")
+    wrinkle =None
+    
 inputfile = args.struct
 
 single_cell=read(inputfile, format=args.intype)
@@ -84,6 +94,7 @@ vec3=single_cell.get_cell()[2]
 
 a=single_cell.get_cell_lengths_and_angles()[0]
 b=single_cell.get_cell_lengths_and_angles()[1]
+
 
 if wrinkle==None:
   if a > b:
@@ -140,11 +151,15 @@ else:
   ctest=cparam
   circumtest=circumference
   while factor*(circumtest-length) < 0:
+     
     if (args.func == 3):
       wavetest = wavetest + factor*0.00001*wavelength
       amptest = amptest + factor*0.00001*amplitude
-    if (args.func == 4):
-      ctest = ctest + factor*0.0001*cparam 
+    elif (args.func == 4):
+      ctest = ctest + factor*0.0001*cparam
+    elif (args.func == 2):
+      amptest= amptest + factor*0.0001*amplitude
+     #print(amptest)
     else:
       if adjusting==0:
         wavetest = wavetest + factor*0.00001*wavelength
@@ -168,6 +183,8 @@ else:
 
 final_cell = single_cell.copy()
 del final_cell[:]
+if (10*amplitude <100 or 10*amplitude > 300):
+       print('[WARNING] check your cell dimension!')
 if (args.func == 3 or args.func == 4):
   if wrinkle == 0:
     final_cell.set_cell([(10*amplitude,0,0),vec2,(0,0,10*amplitude)])
@@ -208,8 +225,8 @@ while counting <= howoften:
   tmp_cell = None
   tmp_cell = single_cell.copy()
   for natom in range(len(tmp_cell.positions)):
-#    print("initial pos",tmp_cell.positions[natom])
-    while tmp_cell.positions[natom][wrinkle] >= pathlength:
+    print("initial pos",tmp_cell.positions[natom])
+    while tmp_cell.positions[natom][wrinkle] > pathlength:
       i += 1
       pathlength=arclength(t0,t0+i*stepping,amplitude,wavelength,cparam)
     x, y, dx, dy = pfunction(t0+i*stepping,amplitude,wavelength,cparam)
