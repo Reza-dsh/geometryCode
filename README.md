@@ -1,3 +1,8 @@
+
+the general tool to make structures using parametric functions 
+implemented functions are wrinkles in form of ellipsoid and sine wave as well as nanotubes with parametric function.
+
+
 usage: create_shape.py [-h] [--func FUNC] [--dir DIR] --A A --length LENGTH
                        [--C C] --struct STRUCT [--intype INTYPE]
                        [--adjust ADJUST] [--out OUT] [--outtype OUTTYPE]
@@ -19,7 +24,5 @@ optional arguments:
   --out OUT          Output file (default=L'length'A'A'.in)
   --outtype OUTTYPE  Type of output file as used in ASE (default=aims)
 
-
-the general tool to make structures using parametric functions (implemented functions are wrinkles in form of ellipsoid and sine wave as well as nanotubes with parametric function.
 
 
