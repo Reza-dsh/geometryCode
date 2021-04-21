@@ -21,6 +21,8 @@ parser.add_argument("--intype", type=str, default='xyz', help="Type of input fil
 parser.add_argument("--adjust", type=int, default=1, help="Adjust the wavelength, 0, or the amplitude, 1 (default=1)")
 parser.add_argument("--out", type=str, help="Output file (default=L'length'A'A'.in)")
 parser.add_argument("--outtype", type=str, default='aims', help="Type of output file as used in ASE (default=aims)")
+parser.add_argument("--unit", type=int, default=0, required=False, help="for wrinkles, this option forces the number of unit cells")
+
 
 args = parser.parse_args()
 
@@ -72,7 +74,7 @@ elif (args.func == 4):
   def arclength(x1, x2, a, b, c):
     return quad(lambda t: np.sqrt(math.pow(((b - a)*(c*np.sin(t*(a/b - 1)) + b*np.sin(t)))/b,2)+math.pow(((b - a)*(c*np.cos(t*(a/b - 1)) - b*np.cos(t)))/b,2)), x1, x2)[0]
 else:
-  print("parametric function ",args.func, " not defined")
+  print(" [fatal error] parametric function ",args.func, " not defined")
   sys.exit()
 
 wrinkle = args.dir
@@ -80,6 +82,12 @@ if wrinkle > 1 or wrinkle <0:
     print( "[WARNING] wrinkle direction ", args.dir, " not defined") 
     print("[WARNING] wrinkle direction is set to None")
     wrinkle =None
+unit = args.unit
+if unit == 0:
+    print( '[WARNING] the number of unit cells in a the wrinkle is not present therefore it is calculated from length and amplitud') 
+if unit != 0 and args.func == 3:
+    print( '[fatal error] I cannot always keep the number of unit cells and make a prefect nanotube') #later I will correct for nanotube as I have to change in both direction, and comment later for the user
+    sys.exit()
     
 inputfile = args.struct
 
@@ -132,13 +140,17 @@ circumference=arclength(0,2*np.pi*multipi,amplitude,wavelength,cparam)
 print("Initial wavelength ", wavelength)
 print("Initial amplitude ", amplitude)
 print("Arclength of the function ", circumference)
-howoften=round(circumference / alat)
+if unit == 0: 
+    howoften=round(circumference / alat)
+else:
+        howoften = unit
 print("How often does the cell fits into this (rounded) ",howoften)
+
 length=howoften*alat
 print("The resulting length of the path would be ",length)
 
 if abs(length-circumference)==0:
-  print("initial is final")
+  print("initial is final") 
 else:
   if length > circumference:
     print("we need to increase")
@@ -148,28 +160,41 @@ else:
     factor=-1.0
   wavetest=wavelength
   amptest=amplitude
+ # print('amptest after amptest', amptest)
   ctest=cparam
   circumtest=circumference
-  while factor*(circumtest-length) < 0:
-     
-    if (args.func == 3):
-      wavetest = wavetest + factor*0.00001*wavelength
-      amptest = amptest + factor*0.00001*amplitude
-    elif (args.func == 4):
-      ctest = ctest + factor*0.0001*cparam
-    elif (args.func == 2):
-      amptest= amptest + factor*0.0001*amplitude
-     #print(amptest)
-    else:
-      if adjusting==0:
-        wavetest = wavetest + factor*0.00001*wavelength
-      if adjusting==1:
-        amptest = amptest + factor*0.00001*amplitude
-    circumtest = arclength(0,2*np.pi*multipi,amptest,wavetest,ctest)
-    if wavetest < 0 or amptest < 0 or ctest < 0:
-      print("wavetest, amptest ",wavetest,amptest)
-      sys.exit('Wavelength or amplitude negative! Reasonable wave form cannot be found.')
-  print("final wavelength and amplitude: ",wavetest,amptest)
+  if unit == 0:
+      while factor*(circumtest-length) < 0:
+         
+        if (args.func == 3):
+          wavetest = wavetest + factor*0.00001*wavelength
+          amptest = amptest + factor*0.00001*amplitude
+        elif (args.func == 4):
+          ctest = ctest + factor*0.0001*cparam
+        elif (args.func == 2):
+          amptest= amptest + factor*0.0001*amplitude
+          #print('amptest in func 2',amptest)
+          #print('factor*(circumtest-length) in func 2', factor*(circumtest-length))
+        else:
+          if adjusting==0:
+            wavetest = wavetest + factor*0.00001*wavelength
+          if adjusting==1:
+            amptest = amptest + factor*0.00001*amplitude
+        circumtest = arclength(0,2*np.pi*multipi,amptest,wavetest,ctest)
+        if wavetest < 0 or amptest < 0 or ctest < 0:
+          print("wavetest, amptest ",wavetest,amptest)
+          sys.exit('Wavelength or amplitude negative! Reasonable wave form cannot be found.')
+  else: 
+  #    print('amptest in the else ',amptest)
+       while factor*(circumtest-length) < 0:
+          
+       #  print('amptest in the while loop ',amptest)
+         print('while status',factor*(circumtest-length),'amptest',amptest)
+         amptest = amptest + factor*0.00001*amplitude 
+         circumtest = arclength(0,2*np.pi*multipi,amptest,wavetest,ctest)
+         if wavetest < 0 or amptest < 0 or ctest < 0:
+          print("amptest ",amptest)
+          sys.exit('Wavelength or amplitude negative! Reasonable wave form cannot be found.')
   howoften=round(circumtest / alat)
   length=howoften*alat
   wavelength=wavetest
