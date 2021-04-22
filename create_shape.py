@@ -189,7 +189,7 @@ else:
        while factor*(circumtest-length) < 0:
           
        #  print('amptest in the while loop ',amptest)
-         print('while status',factor*(circumtest-length),'amptest',amptest)
+       #  print('while status',factor*(circumtest-length),'amptest',amptest)
          amptest = amptest + factor*0.00001*amplitude 
          circumtest = arclength(0,2*np.pi*multipi,amptest,wavetest,ctest)
          if wavetest < 0 or amptest < 0 or ctest < 0:
@@ -250,7 +250,7 @@ while counting <= howoften:
   tmp_cell = None
   tmp_cell = single_cell.copy()
   for natom in range(len(tmp_cell.positions)):
-    print("initial pos",tmp_cell.positions[natom])
+   # print("initial pos",tmp_cell.positions[natom])
     while tmp_cell.positions[natom][wrinkle] > pathlength:
       i += 1
       pathlength=arclength(t0,t0+i*stepping,amplitude,wavelength,cparam)
