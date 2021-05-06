@@ -25,4 +25,6 @@ optional arguments:
   --outtype OUTTYPE  Type of output file as used in ASE (default=aims)
 
 
-
+as an example an input file is added to the repository. with the below line of code:
+python --func 1 --dir 1 --struct input.xyz --A 20 --length 100
+the code tries to creat a sine wave with amplitude 20 and length 100.
