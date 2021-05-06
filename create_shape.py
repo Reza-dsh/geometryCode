@@ -13,8 +13,8 @@ import math
 parser = argparse.ArgumentParser(description="Create a structure of a 2D layer which follows a parametric function")
 parser.add_argument("--func", type=int, default=1, help="The parametric function will be (by default) 1 - sine, 2 - ellipsoidic, 3 - nanotube, 4 - hypotrochoid")
 parser.add_argument("--dir", type=int, help="Create the wrinkle along the specified lattice vector (default=the smaller of 1. or 2. vector)")
-parser.add_argument("--A", type=float, required=True, help="Amplitude of the wave or the 1st radius")
-parser.add_argument("--length", type=float, required=True, help="Wavelength of the wave or the 2nd radius")
+parser.add_argument("--A", type=float, required=False, default=0, help="Amplitude of the wave or the 1st radius")
+parser.add_argument("--length", type=float, required=False, default=0,help="Wavelength of the wave or the 2nd radius")
 parser.add_argument("--C", type=float, default=1.0, help="For some curves a 3rd parameter is needed.")
 parser.add_argument("--struct", type=str, required=True, help="The unit cell of the 2D layer, properly centered along z!")
 parser.add_argument("--intype", type=str, default='xyz', help="Type of input file as used in ASE (default=xyz)")
@@ -28,6 +28,7 @@ args = parser.parse_args()
 
 #
 
+    
 if (args.func == 1):
    def pfunction(t, a, b, c): # the sine-like parametric function. x=t/2pi * wavelength, y=amplitude * sin(t)
     x = t/2/np.pi*b
@@ -78,6 +79,8 @@ else:
   sys.exit()
 
 wrinkle = args.dir
+
+###message section, for making the code neat I put all the messages about the inputs here
 if wrinkle > 1 or wrinkle <0:
     print( "[WARNING] wrinkle direction ", args.dir, " not defined") 
     print("[WARNING] wrinkle direction is set to None")
@@ -87,8 +90,14 @@ if unit == 0:
     print( '[WARNING] the number of unit cells in a the wrinkle is not present therefore it is calculated from length and amplitud') 
 if unit != 0 and args.func == 3:
     print( '[fatal error] I cannot always keep the number of unit cells and make a prefect nanotube') #later I will correct for nanotube as I have to change in both direction, and comment later for the user
-    sys.exit()
-    
+    sys.exit()   
+if (args.A == 0 or args.length == 0):
+        print('[WARNING] no amplitude or wavelength is not given if it is a unitcell only case there will be no problem')
+if (args.A == 0 or args.length == 0) and (args.func != 2):
+        sys.exit('[fatal error ] for the selected shapes I need wavelength and amplitude')
+if (args.A == 0 and args.length == 0 and args.func == 2 and args.unit == 0 ):   
+        sys.exit('[fatal error] for making a cycloidic structure without amplitude and wavelength I need the number of unit cells')
+####################################
 inputfile = args.struct
 
 single_cell=read(inputfile, format=args.intype)
@@ -111,18 +120,25 @@ if wrinkle==None:
     wrinkle=0
 
 if wrinkle==0:
-  print("Wrinkle along lattice direction 1!", a)
+  print("[info] Wrinkle along lattice direction 1!", a)
   nowrinkle=1
 else:
-  print("Wrinkle along lattice direction 2!", b)
+  print("[info] Wrinkle along lattice direction 2!", b)
   nowrinkle=0
 
+alat=single_cell.get_cell_lengths_and_angles()[wrinkle]
+
 #Amplitude and wavelength of the wrinkle in Angstrom
-amplitude=args.A
-wavelength=args.length
+if (args.A ==0 and args.length == 0):
+    amplitude=alat*args.unit/(2*np.pi)
+    wavelength=4*amplitude
+else:
+   amplitude=args.A
+   wavelength=args.length
+
+
 cparam=args.C
 
-alat=single_cell.get_cell_lengths_and_angles()[wrinkle]
 
 #Now, should wavelength (0) or amplitude (1) be adjusted?
 adjusting=args.adjust
@@ -137,26 +153,26 @@ else:
 #circumference=wavelength*special.ellipe(np.sqrt(1-math.pow(amplitude/(wavelength/4),2)))
 circumference=arclength(0,2*np.pi*multipi,amplitude,wavelength,cparam)
 
-print("Initial wavelength ", wavelength)
-print("Initial amplitude ", amplitude)
-print("Arclength of the function ", circumference)
+print("[info] Initial wavelength ", wavelength)
+print("[info] Initial amplitude ", amplitude)
+print("[info] Arclength of the function ", circumference)
 if unit == 0: 
     howoften=round(circumference / alat)
 else:
         howoften = unit
-print("How often does the cell fits into this (rounded) ",howoften)
+print("[info] How often does the cell fits into this (rounded) ",howoften)
 
 length=howoften*alat
-print("The resulting length of the path would be ",length)
+print("[info] The resulting length of the path would be ",length)
 
 if abs(length-circumference)==0:
-  print("initial is final") 
+  print("[info] initial is final") 
 else:
   if length > circumference:
-    print("we need to increase")
+    print("[info] we need to increase")
     factor=1.0
   else:
-    print("we need to reduce")
+    print("[info] we need to reduce")
     factor=-1.0
   wavetest=wavelength
   amptest=amplitude
@@ -201,7 +217,7 @@ else:
   amplitude=amptest
   cparam=ctest
   circumference=circumtest
-  print("Arclength of the function", circumference)
+  print("[info] Arclength of the function", circumference)
   print(arclength(0,2*np.pi*multipi,amplitude,wavelength,cparam))
   print(howoften)
 
@@ -209,7 +225,7 @@ else:
 final_cell = single_cell.copy()
 del final_cell[:]
 if (10*amplitude <100 or 10*amplitude > 300):
-       print('[WARNING] check your cell dimension!')
+       print('[WARNING] check your cell dimension for vacuum size!')
 if (args.func == 3 or args.func == 4):
   if wrinkle == 0:
     final_cell.set_cell([(10*amplitude,0,0),vec2,(0,0,10*amplitude)])
