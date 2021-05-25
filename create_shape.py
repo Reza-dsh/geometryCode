@@ -11,7 +11,7 @@ import sys
 import math
 
 parser = argparse.ArgumentParser(description="Create a structure of a 2D layer which follows a parametric function")
-parser.add_argument("--func", type=int, default=1, help="The parametric function will be (by default) 1 - sine, 2 - ellipsoidic, 3 - nanotube, 4 - hypotrochoid")
+parser.add_argument("--func", type=int, default=1, help="The parametric function will be (by default) 1 - sine, 2 - ellipsoidic, 3 - nanotube, 4 - hypotrochoid 5- two sines")
 parser.add_argument("--dir", type=int, help="Create the wrinkle along the specified lattice vector (default=the smaller of 1. or 2. vector)")
 parser.add_argument("--A", type=float, required=False, default=0, help="Amplitude of the wave or the 1st radius")
 parser.add_argument("--length", type=float, required=False, default=0,help="Wavelength of the wave or the 2nd radius")
@@ -74,6 +74,29 @@ elif (args.func == 4):
     return(x, y, dx, dy)
   def arclength(x1, x2, a, b, c):
     return quad(lambda t: np.sqrt(math.pow(((b - a)*(c*np.sin(t*(a/b - 1)) + b*np.sin(t)))/b,2)+math.pow(((b - a)*(c*np.cos(t*(a/b - 1)) - b*np.cos(t)))/b,2)), x1, x2)[0]
+elif (args.func == 5):
+  def pfunction(t, a, b, c): # two sines function with seven parameters (including one shift) a0*sin(a1*x+a2)+a3*sin(a4*s+a5)+a6
+    a0=a*(-1.08971)
+    a1=1 #I had to change the a1 and a4 to get the perfect periodicity, other values are one of the fitted data
+    a2=-3.17079
+    a3=a*0.110569
+    a4=3
+    a5=-6.23166
+    a6=0
+    x = t/2/np.pi*b
+    y = a0*np.sin(a1*t+a2)+a3*np.sin(a4*t+a5)+a6
+    dx = b/2/np.pi
+    dy = a0*a1*np.cos(a1*t+a2)+a3*a4*np.cos(a4*t+a5)
+    return(x, y, dx, dy)
+  def arclength(x1, x2, a, b, c):
+    a0=a*(-1.08971)
+    a1=0.987038
+    a2=-3.17079
+    a3=a*0.110569
+    a4=2.91407
+    a5=-6.23166
+    return quad(lambda t: np.sqrt(math.pow(a0*a1*np.cos(a1*t+a2)+a3*a4*np.cos(a4*t+a5),2)+math.pow(b/2/np.pi,2)), x1, x2)[0]
+
 else:
   print(" [fatal error] parametric function ",args.func, " not defined")
   sys.exit()
@@ -218,8 +241,8 @@ else:
   cparam=ctest
   circumference=circumtest
   print("[info] Arclength of the function", circumference)
-  print(arclength(0,2*np.pi*multipi,amplitude,wavelength,cparam))
-  print(howoften)
+  #print(arclength(0,2*np.pi*multipi,amplitude,wavelength,cparam))
+  print('[info] number of unit cell is',howoften)
 
 
 final_cell = single_cell.copy()
@@ -253,7 +276,7 @@ else:
 #  rotation_axis=-vec1
 
 rotation_axis=rotation_axis/np.linalg.norm(rotation_axis)
-print(rotation_axis)
+print('[info] rotation axis:',rotation_axis)
 
 stepping = 0.00001 * np.pi
 t0 = 0
