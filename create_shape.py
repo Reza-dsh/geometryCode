@@ -53,9 +53,11 @@ def chiral_unitcell(inputfile,outfile,m,n):
     P=[[m,n,0],[l1,l2,0],[0,0,1]]
     final_cell = make_supercell(single_cell,P,wrap=False)  
     final_cell.rotate(np.degrees(np.arctan(-final_cell.get_cell()[0][1]/final_cell.get_cell()[0][0])),(0,0,1),rotate_cell=True)
-    positions = final_cell.get_positions()
-    positions[:,2] = 0 # make things on the ground
-    final_cell.set_positions(positions)
+    cm=final_cell.get_center_of_mass()
+    final_cell.translate([0,0,-cm[2]])
+    # positions = final_cell.get_positions()
+    # positions[:,2] = 0 # make things on the ground
+    # final_cell.set_positions(positions)
     write(outfile,final_cell, format='aims',wrap=False)
     return final_cell,l1,l2
 
@@ -180,7 +182,7 @@ if unit != 0 and args.func == 3:
     sys.exit()   
 if (args.A == 0 or args.length == 0):
         print('[WARNING] no amplitude or wavelength is not given if it is a unitcell only case there will be no problem')
-if (args.A == 0 or args.length == 0) and (args.func != 2 and args.func !=6 ):
+if (args.A == 0 or args.length == 0) and (args.func != 2 and args.func !=6 and args.chiral ==0):
         sys.exit('[fatal error ] for the selected shapes I need wavelength and amplitude')
 if (args.A == 0 and args.length == 0 and args.func == 2 and args.unit == 0 and args.chiral ==0):   
         sys.exit('[fatal error] for making a cycloidic structure without amplitude and wavelength I need the number of unit cells if the structure is chiral provide rolling vector')
