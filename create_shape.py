@@ -14,7 +14,7 @@ import math
 import matplotlib.pyplot as plt
 from scipy.interpolate import splrep,splev
 # from scipy.signal import argrelextrema
-# from chiral.py import *
+
 
 parser = argparse.ArgumentParser(description="Create a structure of a 2D layer which follows a parametric function")
 parser.add_argument("--func", type=int, default=2, help="The parametric function will be (by default) \
@@ -219,11 +219,13 @@ else:
   nowrinkle=0
 
 alat=single_cell.get_cell_lengths_and_angles()[wrinkle]
-
+func = args.func
 #Amplitude and wavelength of the wrinkle in Angstrom
 if (args.A ==0 and args.length == 0 and chiral ==0):
     amplitude=alat*args.unit/(2*np.pi)
     wavelength=4*amplitude
+elif(chiral ==0 and func == 2): 
+     amplitude=alat*args.unit/2/(2*np.pi)
 elif (chiral !=0 and args.A==0):
     wavelength = np.linalg.norm(vec1)
     amplitude =0.25* wavelength
