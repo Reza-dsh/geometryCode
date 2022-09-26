@@ -45,9 +45,9 @@ def chiral_unitcell(inputfile,outfile,m,n):
     ################# reading the geometry
     single_cell = read(inputfile, format='aims')
     gcd_value = math.gcd(m,n)
-    n=n/gcd_value
-    m=m/gcd_value
-    ##formula for hexagonal unit cell
+    # n=n/gcd_value
+    # m=m/gcd_valu
+    # formula for hexagonal unit cell
     l1=-(2*n+m)
     l2=2*m+n
     P=[[m,n,0],[l1,l2,0],[0,0,1]]
@@ -226,9 +226,12 @@ if (args.A ==0 and args.length == 0 and chiral ==0):
     wavelength=4*amplitude
 elif(chiral ==0 and func == 2): 
      amplitude=alat*args.unit/2/(2*np.pi)
-elif (chiral !=0 and args.A==0):
+elif (chiral !=0 and args.A==0 and func == 2):
     wavelength = np.linalg.norm(vec1)
-    amplitude =0.25* wavelength
+    amplitude = 0.25* wavelength
+elif (chiral !=0 and func == 3):
+    wavelength = np.linalg.norm(vec1)/4
+    amplitude = wavelength
 elif (chiral !=0 and args.A !=0):
     wavelength = np.linalg.norm(vec1)
     amplitude = args.A
