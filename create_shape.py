@@ -19,7 +19,7 @@ from scipy.interpolate import splrep,splev
 parser = argparse.ArgumentParser(description="Create a structure of a 2D layer which follows a parametric function")
 parser.add_argument("--func", type=int, default=2, help="The parametric function will be (by default) \
                     1 - sine, 2 - ellipsoidic, 3 - nanotube, 4 - hypotrochoid 5- two sines 6- numeric ")
-parser.add_argument("--dir", type=int, help="Create the wrinkle along the specified lattice vector (default=the smaller of 1 or 2. vector)")
+parser.add_argument("--dir", type=int, default=0, help="Create the wrinkle along the specified lattice vector (default=the smaller of 1 or 2. vector)")
 parser.add_argument("--A", type=float, required=False, default=0, help="Amplitude of the wave or the 1st radius")
 parser.add_argument("--length", type=float, required=False, default=0,help="Wavelength of the wave or the 2nd radius")
 parser.add_argument("--C", type=float, default=1.0, help="For some curves a 3rd parameter is needed.")
@@ -170,7 +170,7 @@ wrinkle = args.dir
 chiral = args.chiral
 m,n =args.chiral
 ###message section, for making the code neat I put all the messages about the inputs here
-if wrinkle > 1 or wrinkle <0:
+if (wrinkle > 1 or wrinkle <0 and chiral==0):
     print( "[WARNING] wrinkle direction ", args.dir, " not defined") 
     print("[WARNING] wrinkle direction is set to None")
     wrinkle =None
