@@ -19,7 +19,7 @@ from scipy.interpolate import splrep,splev
 parser = argparse.ArgumentParser(description="Create a structure of a 2D layer which follows a parametric function")
 parser.add_argument("--func", type=int, default=2, help="The parametric function will be (by default) \
                     1 - sine, 2 - ellipsoidic, 3 - nanotube, 4 - hypotrochoid 5- two sines 6- numeric ")
-parser.add_argument("--dir", type=int, default=0, help="Create the wrinkle along the specified lattice vector (default=the smaller of 1 or 2. vector)")
+parser.add_argument("--dir", type=int, default=1, help="Create the wrinkle along the specified lattice vector (default=the smaller of 1 or 2. vector)")
 parser.add_argument("--A", type=float, required=False, default=0, help="Amplitude of the wave or the 1st radius")
 parser.add_argument("--length", type=float, required=False, default=0,help="Wavelength of the wave or the 2nd radius")
 parser.add_argument("--C", type=float, default=1.0, help="For some curves a 3rd parameter is needed.")
@@ -46,7 +46,7 @@ def chiral_unitcell(inputfile,outfile,m,n):
     single_cell = read(inputfile, format='aims')
     gcd_value = math.gcd(m,n)
     # n=n/gcd_value
-    # m=m/gcd_valu
+    # m=m/gcd_value
     # formula for hexagonal unit cell
     l1=-(2*n+m)
     l2=2*m+n
@@ -352,6 +352,7 @@ else:
     final_cell.set_cell([(wavelength/a)*vec1,vec2,(0,0,10*amplitude)])
   else:
     final_cell.set_cell([vec1,(wavelength/b)*vec2,(0,0,10*amplitude)])
+
 
 ###
 ### Note for myself: it is not correct to rotate around one of the cell vectors!!
