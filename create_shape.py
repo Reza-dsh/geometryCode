@@ -195,7 +195,7 @@ if chiral !=0:
 else:
      single_cell=read(inputfile, format=args.intype)
 #single_cell.wrap(pbc=[1,1,1],center=(0.0,0.0,0.0))
-print(single_cell.get_positions())
+# print(single_cell.get_positions())
 
 vec1=single_cell.get_cell()[0]
 vec2=single_cell.get_cell()[1]
@@ -231,7 +231,7 @@ elif (chiral !=0 and args.A==0 and func == 2):
     wavelength = np.linalg.norm(vec1)
     amplitude = 0.25* wavelength
 elif (chiral !=0 and func == 3):
-    wavelength = np.linalg.norm(vec1)/4
+    wavelength = np.linalg.norm(vec1)/2/(2*np.pi)
     amplitude = wavelength
 elif (chiral !=0 and args.A !=0):
     wavelength = np.linalg.norm(vec1)
