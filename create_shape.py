@@ -50,6 +50,9 @@ def chiral_unitcell(inputfile,outfile,m,n):
     # formula for hexagonal unit cell
     l1=-(2*n+m)
     l2=2*m+n
+    gcd_value = math.gcd(l1,l2)
+    l1=l1/gcd_value
+    l2=l2/gcd_value
     P=[[m,n,0],[l1,l2,0],[0,0,1]]
     final_cell = make_supercell(single_cell,P,wrap=False)  
     final_cell.rotate(np.degrees(np.arctan(-final_cell.get_cell()[0][1]/final_cell.get_cell()[0][0])),(0,0,1),rotate_cell=True)
