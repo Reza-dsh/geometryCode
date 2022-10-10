@@ -168,7 +168,7 @@ else:
 
 wrinkle = args.dir
 chiral = args.chiral
-m,n =args.chiral
+if chiral!=0: m,n =args.chiral
 ###message section, for making the code neat I put all the messages about the inputs here
 if (wrinkle > 1 or wrinkle <0 and chiral!=0):
     print( "[WARNING] wrinkle direction ", args.dir, " not defined") 
