@@ -231,7 +231,7 @@ if (args.A ==0 and args.length == 0 and chiral ==0):
 elif(chiral ==0 and func == 2): 
      amplitude=alat*args.unit/2/(2*np.pi)
 elif (chiral !=0 and args.A==0 and func == 2):
-    wavelength = np.linalg.norm(vec1)
+    wavelength = 2*np.linalg.norm(vec1)/(np.pi)
     amplitude = 0.25* wavelength
 elif (chiral !=0 and func == 3):
     wavelength = np.linalg.norm(vec1)/2/(2*np.pi)
