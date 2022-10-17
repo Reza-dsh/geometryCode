@@ -234,7 +234,7 @@ elif (chiral !=0 and args.A==0 and func == 2):
     wavelength = 2*np.linalg.norm(vec1)/(np.pi)
     amplitude = 0.25* wavelength
 elif (chiral !=0 and func == 3):
-    wavelength = np.linalg.norm(vec1)/2/(2*np.pi)
+    wavelength = (np.linalg.norm(vec1)+(np.linalg.norm(vec1)/np.sqrt(n**2+m**2)))/2/(2*np.pi)
     amplitude = wavelength
 elif (chiral !=0 and args.A !=0):
     wavelength = np.linalg.norm(vec1)
