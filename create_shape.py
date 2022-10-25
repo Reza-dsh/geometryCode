@@ -234,7 +234,8 @@ elif (chiral !=0 and args.A==0 and func == 2):
     wavelength = 2*np.linalg.norm(vec1)/(np.pi)
     amplitude = 0.25* wavelength
 elif (chiral !=0 and func == 3):
-    wavelength = (np.linalg.norm(vec1)+(np.linalg.norm(vec1)/np.sqrt(n**2+m**2)))/2/(2*np.pi)
+   # wavelength = (np.linalg.norm(vec1)+(np.linalg.norm(vec1)/np.sqrt(n**2+m**2)))/2/(2*np.pi)
+    wavelength = (np.linalg.norm(vec1))/(2*np.pi)
     amplitude = wavelength
 elif (chiral !=0 and args.A !=0):
     wavelength = np.linalg.norm(vec1)
@@ -350,14 +351,14 @@ if (10*amplitude <100 or 10*amplitude > 300):
        print('[WARNING] check your cell dimension for vacuum size!')
 if (args.func == 3 or args.func == 4):
   if wrinkle == 0:
-    final_cell.set_cell([(10*amplitude,0,0),vec2,(0,0,10*amplitude)])
+    final_cell.set_cell([(20*amplitude,0,0),vec2,(0,0,20*amplitude)])
   else:
-    final_cell.set_cell([vec1,(0,10*amplitude,0),(0,0,10*amplitude)])
+    final_cell.set_cell([vec1,(0,20*amplitude,0),(0,0,20*amplitude)])
 else:
   if wrinkle == 0:
-    final_cell.set_cell([(wavelength/a)*vec1,vec2,(0,0,10*amplitude)])
+    final_cell.set_cell([(wavelength/a)*vec1,vec2,(0,0,20*amplitude)])
   else:
-    final_cell.set_cell([vec1,(wavelength/b)*vec2,(0,0,10*amplitude)])
+    final_cell.set_cell([vec1,(wavelength/b)*vec2,(0,0,20*amplitude)])
 
 
 ###
